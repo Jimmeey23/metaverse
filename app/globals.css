@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  /* Light */
+  --bg: 220 40% 98%;
+  --surface: 0 0% 100%;
+  --elevated: 220 40% 99%;
+  --line: 220 16% 88%;
+  --ink: 222 47% 11%;
+  --muted: 220 12% 42%;
+  --faint: 220 12% 62%;
+  --shadow: 222 47% 11%;
+
+  --brand-50: 214 95% 96%;
+  --brand-400: 214 89% 60%;
+  --brand-500: 214 89% 52%;
+  --brand-600: 214 89% 44%;
+
+  --accent: 262 83% 58%;
+  --accent-2: 189 94% 43%;
+  --pos: 158 74% 38%;
+  --neg: 0 74% 48%;
+  --warn: 35 92% 45%;
+  --info: 214 89% 52%;
+
+  --chart-1: 214 89% 52%;
+  --chart-2: 262 83% 58%;
+  --chart-3: 189 94% 43%;
+  --chart-4: 158 74% 38%;
+  --chart-5: 35 92% 45%;
+  --chart-6: 330 81% 56%;
+  --grid: 220 16% 88%;
+}
+
+.dark {
+  --bg: 224 32% 6%;
+  --surface: 224 28% 9%;
+  --elevated: 224 26% 12%;
+  --line: 223 20% 20%;
+  --ink: 210 40% 98%;
+  --muted: 218 14% 65%;
+  --faint: 218 12% 46%;
+  --shadow: 0 0% 0%;
+
+  --brand-50: 214 89% 18%;
+  --brand-400: 214 95% 62%;
+  --brand-500: 214 89% 58%;
+  --brand-600: 214 89% 70%;
+
+  --accent: 262 83% 68%;
+  --accent-2: 189 94% 50%;
+  --pos: 158 64% 48%;
+  --neg: 0 84% 62%;
+  --warn: 38 92% 55%;
+  --info: 199 89% 60%;
+
+  --chart-1: 214 95% 62%;
+  --chart-2: 262 83% 70%;
+  --chart-3: 189 94% 50%;
+  --chart-4: 158 64% 48%;
+  --chart-5: 38 92% 55%;
+  --chart-6: 330 81% 62%;
+  --grid: 223 20% 22%;
+}
+
+* { border-color: hsl(var(--line)); }
+
+html, body { height: 100%; }
+body {
+  background-color: hsl(var(--bg));
+  color: hsl(var(--ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Ambient background glow */
+.app-canvas {
+  position: relative;
+  isolation: isolate;
+}
+.app-canvas::before {
+  content: "";
+  position: fixed;
+  inset: -30% -10% auto -10%;
+  height: 70vh;
+  z-index: -1;
+  background:
+    radial-gradient(50% 50% at 20% 30%, hsl(var(--brand-500) / 0.16), transparent 70%),
+    radial-gradient(45% 45% at 78% 10%, hsl(var(--accent) / 0.14), transparent 70%),
+    radial-gradient(40% 40% at 60% 60%, hsl(var(--accent-2) / 0.10), transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.panel {
+  background: hsl(var(--surface) / 0.72);
+  border: 1px solid hsl(var(--line) / 0.9);
+  backdrop-filter: blur(14px);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 2px hsl(var(--shadow) / 0.05), 0 18px 40px -28px hsl(var(--shadow) / 0.4);
+}
+.dark .panel { background: hsl(var(--surface) / 0.66); }
+
+.panel-hover { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.panel-hover:hover { transform: translateY(-2px); border-color: hsl(var(--brand-500) / .35); box-shadow: 0 2px 6px hsl(var(--shadow)/0.08), 0 26px 50px -26px hsl(var(--shadow)/0.45); }
+
+.grad-text {
+  background: linear-gradient(100deg, hsl(var(--brand-400)), hsl(var(--accent)) 55%, hsl(var(--accent-2)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--line)); border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--faint)); background-clip: content-box; }
+
+/* recharts polish */
+.recharts-cartesian-axis-tick text { fill: hsl(var(--faint)); font-size: 11px; }
+.recharts-curve.recharts-tooltip-cursor { fill: hsl(var(--ink) / 0.04); }
+.recharts-default-tooltip { border-radius: 14px !important; }
+.recharts-surface { overflow: visible; }
+
+.skeleton {
+  position: relative; overflow: hidden; background: hsl(var(--line) / .5);
+}
+.skeleton::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, hsl(var(--ink) / .07), transparent);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ───────────────────────── Print / PDF report ───────────────────────── */
+@media print {
+  @page { margin: 14mm; size: A4 portrait; }
+  html, body { background: #fff !important; color: #000 !important; }
+  .app-canvas::before { display: none !important; }
+  .panel, .panel-hover { box-shadow: none !important; border-color: #d4d4d8 !important; background: #fff !important; backdrop-filter: none !important; }
+  .grad-text { -webkit-text-fill-color: #18181b !important; color: #18181b !important; }
+  a { color: inherit !important; text-decoration: none !important; }
+  table { break-inside: auto; }
+  tr, li { break-inside: avoid; }
+  .panel { break-inside: avoid; }
+  .skeleton { display: none !important; }
+}
