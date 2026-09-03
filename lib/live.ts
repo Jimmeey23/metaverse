@@ -155,7 +155,7 @@ async function fetchLeads(ctx: Ctx, token: string, range: Range) {
   const since = Math.floor(Date.parse(`${range.since}T00:00:00Z`) / 1000);
   const until = Math.floor(Date.parse(`${range.until}T23:59:59Z`) / 1000);
   const pages = await safe<any[]>(ctx, "Pages", () =>
-    getEdge(token, "me", "accounts", { fields: "id,name,access_token,leadgen_forms{id,name,status,leads_count,created_time,locale,questions{id,label,type}}", limit: 100 }), []);
+    getEdge(token, "me", "accounts", { fields: "id,name,access_token,tasks", limit: 100 }), []);
 
   const forms: LeadForm[] = [];
   const leads: Lead[] = [];
@@ -163,7 +163,22 @@ async function fetchLeads(ctx: Ctx, token: string, range: Range) {
 
   for (const page of pages) {
     const pageToken = (page.access_token as string) || token;
-    for (const form of page.leadgen_forms?.data ?? []) {
+    let pageForms: any[] = [];
+    try {
+      pageForms = await getEdge(pageToken, String(page.id), "leadgen_forms", {
+        fields: "id,name,status,leads_count,created_time,locale,questions{id,label,type}",
+        limit: 100,
+      });
+    } catch (err) {
+      // Ad-account access does not guarantee lead access for every associated
+      // Page. Skip an inaccessible Page without failing all form discovery.
+      const message = err instanceof Error ? err.message : String(err);
+      if (!message.toLowerCase().includes("insufficient privileges")) {
+        ctx.warnings.push(`Lead forms (${page.name ?? page.id}): ${message}`);
+      }
+      continue;
+    }
+    for (const form of pageForms) {
       forms.push({
         id: String(form.id),
         name: form.name ?? "Untitled form",
@@ -257,7 +272,7 @@ async function fetchPixel(ctx: Ctx, token: string, accountId: string, range: Ran
   const stats = await safe<any>(ctx, "Pixel stats", async () => {
     const json = await graphRequest(
       `${primary.id}/stats`,
-      { start_time: start, end_time: end, aggregation: "event_type" },
+      { start_time: start, end_time: end, aggregation: "event" },
       token,
     );
     return json;
@@ -336,7 +351,10 @@ export async function buildLiveData(token: string, account: Account, range: Rang
       safe<any[]>(ctx, "Ad set insights", () => getInsights(token, account.id, { fields: `adset_id,adset_name,campaign_id,campaign_name,${BASE_FIELDS}${RANKING_FIELDS}`, level: "adset", time_range: timeRange, limit: 500 }), []),
       safe<any[]>(ctx, "Ad set metadata", () => getEdge(token, account.id, "adsets", { fields: "id,name,campaign_id,status,effective_status,daily_budget,lifetime_budget,targeting{age_min,age_max,genders,geo_locations,publisher_platforms,facebook_positions,instagram_positions,device_platforms,interests,flexible_spec}", limit: 300 }), []),
       safe<any[]>(ctx, "Ad insights", () => getInsights(token, account.id, { fields: `ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,${BASE_FIELDS}${RANKING_FIELDS}`, level: "ad", time_range: timeRange, limit: 500 }), []),
-      safe<any[]>(ctx, "Ad metadata", () => getEdge(token, account.id, "ads", { fields: "id,name,adset_id,campaign_id,status,effective_status,creative{id,name,title,body,image_url,thumbnail_url,object_story_spec,call_to_action_type,asset_feed_spec}", limit: 400 }), []),
+      safe<any[]>(ctx, "Ad metadata", () => getEdge(token, account.id, "ads", {
+        fields: "id,name,adset_id,campaign_id,status,effective_status,creative{id,name,title,body,image_url,thumbnail_url,call_to_action_type}",
+        limit: 100,
+      }), []),
       safe<any[]>(ctx, "Age & gender breakdown", () => getInsights(token, account.id, { fields: BASE_FIELDS, level: "account", breakdowns: "age,gender", time_range: timeRange, limit: 200 }), []),
       safe<any[]>(ctx, "Platform breakdown", () => getInsights(token, account.id, { fields: BASE_FIELDS, level: "account", breakdowns: "publisher_platform", time_range: timeRange, limit: 50 }), []),
       safe<any[]>(ctx, "Placement breakdown", () => getInsights(token, account.id, { fields: BASE_FIELDS, level: "account", breakdowns: "publisher_platform,platform_position", time_range: timeRange, limit: 200 }), []),
