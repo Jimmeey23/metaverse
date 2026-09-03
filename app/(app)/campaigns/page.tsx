@@ -4,6 +4,7 @@ import { loadReport } from "@/lib/data";
 import { Panel, PanelHeader, Sparkline, EmptyState } from "@/components/ui/primitives";
 import { MiniStatRow } from "@/components/panels/kpi-grid";
 import { CampaignExplorer, TopCreatives } from "@/components/panels/campaign-explorer";
+import { CreativeGallery } from "@/components/panels/creative-gallery";
 import { BubbleScatter, TrendChart } from "@/components/charts";
 import { currency, num, objectiveLabel, pct, rankingLabel, rankingTone } from "@/lib/format";
 import { pctChange, safeDiv, titleCase as tc } from "@/lib/utils";
@@ -136,6 +137,8 @@ export default async function CampaignsPage({
       />
 
       <CampaignExplorer campaigns={data.campaigns} adSets={data.adSets} ads={data.ads} code={code} />
+
+      <CreativeGallery ads={data.ads} code={code} />
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Panel className="xl:col-span-2">

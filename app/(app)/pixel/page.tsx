@@ -3,6 +3,7 @@ import { Activity, BookOpen, CircleDot, Gauge, Radio, ShieldCheck } from "lucide
 import { loadReport } from "@/lib/data";
 import { Badge, Callout, EmptyState, Panel, PanelHeader } from "@/components/ui/primitives";
 import { EventFunnel, PixelDiagnostics, PixelEventsTable, PixelOverview } from "@/components/panels/pixel-panel";
+import { DataQualityAlert } from "@/components/panels/data-quality-alert";
 import { compact, currency, eventLabel, num, relative } from "@/lib/format";
 import { safeDiv } from "@/lib/utils";
 
@@ -54,11 +55,7 @@ export default async function PixelPage({
         </Callout>
       ) : null}
 
-      {data.warnings.length ? (
-        <Callout tone="info" icon={<Activity className="h-4 w-4" />} title="Data notes">
-          {data.warnings.slice(0, 4).join(" · ")}
-        </Callout>
-      ) : null}
+      <DataQualityAlert warnings={data.warnings} />
 
       {pixel ? (
         <>
@@ -184,7 +181,7 @@ export default async function PixelPage({
                   <Badge tone={e.quality === "good" ? "pos" : e.quality === "medium" ? "warn" : "neg"}>{e.quality ?? "n/a"}</Badge>
                 </div>
                 <p className="mt-1 text-[11px] text-faint">
-                  {num(e.count)} events · {e.matched}% match quality
+                  {num(e.count)} events · {e.matched > 0 ? `${e.matched}% match quality` : "match quality available in Events Manager"}
                 </p>
               </div>
             ))}

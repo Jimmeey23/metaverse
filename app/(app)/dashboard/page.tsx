@@ -5,6 +5,7 @@ import {
   Sparkles, Target, UserPlus, Wallet,
 } from "lucide-react";
 import { loadReport } from "@/lib/data";
+import { DataQualityAlert } from "@/components/panels/data-quality-alert";
 import { generateInsights, insightScore } from "@/lib/insights";
 import { buildSummary, summaryToText } from "@/lib/summary";
 import { ExecutiveSummary } from "@/components/panels/executive-summary";
@@ -89,11 +90,7 @@ export default async function DashboardPage({
         </Callout>
       ) : null}
 
-      {data.warnings.length ? (
-        <Callout tone="warn" icon={<Activity className="h-4 w-4" />} title="Some data could not be loaded">
-          {data.warnings.slice(0, 3).join(" · ")}
-        </Callout>
-      ) : null}
+      <DataQualityAlert warnings={data.warnings} />
 
       {/* KPIs */}
       <section className="space-y-3">

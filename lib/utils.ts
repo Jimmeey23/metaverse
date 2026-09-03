@@ -74,6 +74,18 @@ export function titleCase(s: string) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/** Derive a P57 studio from the naming convention used on Meta entities. */
+export function inferStudioLocation(...values: Array<string | undefined | null>) {
+  const value = values.filter(Boolean).join(" ").toLowerCase();
+  const rules: Array<[RegExp, string]> = [
+    [/\b(bandra|bdra)\b/i, "Bandra"],
+    [/\b(kemps(?:\s+corner)?|kc)\b/i, "Kemps Corner"],
+    [/\b(bengaluru|bangalore|blr)\b/i, "Bengaluru"],
+    [/\b(mumbai|bom)\b/i, "Mumbai — multi-studio"],
+  ];
+  return rules.find(([pattern]) => pattern.test(value))?.[1] ?? "Unassigned";
+}
+
 export function initials(name: string) {
   return name
     .split(/\s+/)

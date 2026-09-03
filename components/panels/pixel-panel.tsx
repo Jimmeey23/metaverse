@@ -41,15 +41,7 @@ export function PixelEventsTable({ pixel, code }: { pixel: PixelConfig; code: st
                 {e.delta > 0 ? "+" : ""}{e.delta}%
               </td>
               <td className="px-3 py-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-24 overflow-hidden rounded-full bg-ink/10">
-                    <div
-                      className={cn("h-full rounded-full", e.matched >= 92 ? "bg-pos" : e.matched >= 85 ? "bg-warn" : "bg-neg")}
-                      style={{ width: `${e.matched}%` }}
-                    />
-                  </div>
-                  <span className="text-[11px] num text-muted">{e.matched}%</span>
-                </div>
+                {e.matched > 0 ? <div className="flex items-center gap-2"><div className="h-1.5 w-24 overflow-hidden rounded-full bg-ink/10"><div className={cn("h-full rounded-full", e.matched >= 92 ? "bg-pos" : e.matched >= 85 ? "bg-warn" : "bg-neg")} style={{ width: `${e.matched}%` }} /></div><span className="text-[11px] num text-muted">{e.matched}%</span></div> : <span className="text-[11px] text-faint">Verify in Events Manager</span>}
               </td>
               <td className="px-3 py-2.5">
                 {e.trend?.length ? <Sparkline data={e.trend} width={110} height={26} /> : <span className="text-[11px] text-faint">—</span>}
@@ -89,6 +81,14 @@ export function PixelDiagnostics({ pixel }: { pixel: PixelConfig }) {
               {d.value ? <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] text-muted">{d.value}</span> : null}
             </div>
             <p className="mt-0.5 text-[11px] text-muted">{d.detail}</p>
+            {d.status !== "pass" && (d.cause || d.resolution?.length) ? (
+              <details className="mt-2 rounded-lg border border-line/70 bg-surface/60 px-3 py-2">
+                <summary className="cursor-pointer text-[11px] font-semibold text-ink">Cause, evidence and exact resolution</summary>
+                {d.cause ? <p className="mt-2 text-[11px] text-muted"><span className="font-semibold text-ink">Cause:</span> {d.cause}</p> : null}
+                {d.evidence ? <p className="mt-1 text-[11px] text-muted"><span className="font-semibold text-ink">Evidence:</span> {d.evidence}</p> : null}
+                {d.resolution?.length ? <ol className="mt-2 space-y-1.5 text-[11px] text-muted">{d.resolution.map((step, index) => <li key={step} className="flex gap-2"><span className="num font-semibold text-brand-500">{index + 1}.</span><span>{step}</span></li>)}</ol> : null}
+              </details>
+            ) : null}
           </div>
         </li>
       ))}

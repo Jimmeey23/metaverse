@@ -11,6 +11,7 @@ type AccountLite = { id: string; name: string; currency: string };
 const TITLES: Record<string, string> = {
   "/dashboard": "Account overview",
   "/campaigns": "Campaign performance",
+  "/analytics": "Advanced analytics",
   "/audience": "Audience & placements",
   "/leads": "Leads & lead forms",
   "/pixel": "Pixel & events",

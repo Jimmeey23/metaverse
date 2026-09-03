@@ -90,13 +90,17 @@ export type CampaignRow = {
   engagementRanking?: Ranking;
   conversionRanking?: Ranking;
   trend: number[];
+  location?: string;
 };
 
 export type AdSetRow = CampaignRow & { campaignId: string; campaignName: string };
 export type AdRow = CampaignRow & {
   adSetId: string;
   adSetName: string;
-  creative?: { title?: string; body?: string; thumbnail?: string; cta?: string; format?: string } | null;
+  creative?: {
+    id?: string; title?: string; body?: string; thumbnail?: string; imageUrl?: string;
+    videoUrl?: string; permalink?: string; videoId?: string; cta?: string; format?: string;
+  } | null;
 };
 
 export type BreakdownRow = {
@@ -173,6 +177,9 @@ export type PixelDiagnostic = {
   status: "pass" | "warn" | "fail";
   detail: string;
   value?: string;
+  cause?: string;
+  evidence?: string;
+  resolution?: string[];
 };
 
 export type PixelConfig = {
