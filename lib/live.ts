@@ -358,7 +358,7 @@ export async function buildLiveData(token: string, account: Account, range: Rang
       safe<any[]>(ctx, "Ad set metadata", () => getEdge(token, account.id, "adsets", { fields: "id,name,campaign_id,status,effective_status,daily_budget,lifetime_budget,targeting{age_min,age_max,genders,geo_locations,publisher_platforms,facebook_positions,instagram_positions,device_platforms,interests,flexible_spec}", limit: 300 }), []),
       safe<any[]>(ctx, "Ad insights", () => getInsights(token, account.id, { fields: `ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,${BASE_FIELDS}${RANKING_FIELDS}`, level: "ad", time_range: timeRange, limit: 500 }), []),
       safe<any[]>(ctx, "Ad metadata", () => getEdge(token, account.id, "ads", {
-        fields: "id,name,adset_id,campaign_id,status,effective_status,creative{id,name,title,body,image_url,thumbnail_url,video_id,effective_object_story_id,call_to_action_type,object_story_spec,asset_feed_spec}",
+        fields: "id,name,adset_id,campaign_id,status,effective_status,creative{id,name,title,body,image_url,thumbnail_url,video_id,effective_object_story_id,call_to_action_type}",
         limit: 500,
       }), []),
       safe<any[]>(ctx, "Age & gender breakdown", () => getInsights(token, account.id, { fields: BASE_FIELDS, level: "account", breakdowns: "age,gender", time_range: timeRange, limit: 200 }), []),

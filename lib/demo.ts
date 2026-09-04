@@ -40,6 +40,18 @@ const AD_ANGLES = [
 ];
 const CTAS = ["LEARN_MORE", "SIGN_UP", "SHOP_NOW", "GET_QUOTE", "BOOK_NOW", "CONTACT_US"];
 
+function demoCreativeThumbnail(title: string, format: string, index: number) {
+  const palettes = [
+    ["#5b21b6", "#db2777", "#f59e0b"], ["#0f766e", "#0891b2", "#67e8f9"],
+    ["#1d4ed8", "#7c3aed", "#c4b5fd"], ["#9f1239", "#e11d48", "#fda4af"],
+  ];
+  const [from, to, accent] = palettes[index % palettes.length];
+  const safeTitle = title.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[char]!);
+  const isVideo = /video|reel/i.test(format);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs><rect width="960" height="540" fill="url(#g)"/><circle cx="820" cy="80" r="210" fill="${accent}" opacity=".26"/><circle cx="90" cy="520" r="250" fill="#fff" opacity=".08"/><text x="64" y="76" fill="#fff" opacity=".78" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="4">META INSIGHT • DEMO</text><foreignObject x="64" y="150" width="700" height="220"><div xmlns="http://www.w3.org/1999/xhtml" style="font:700 56px/1.08 Arial,sans-serif;color:white">${safeTitle}</div></foreignObject>${isVideo ? `<circle cx="850" cy="430" r="52" fill="#000" opacity=".55"/><path d="M835 400l46 30-46 30z" fill="#fff"/>` : ""}<rect x="64" y="430" width="190" height="48" rx="24" fill="#fff"/><text x="159" y="461" text-anchor="middle" fill="${from}" font-family="Arial,sans-serif" font-size="18" font-weight="700">LEARN MORE</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 function pick<T>(rnd: () => number, arr: readonly T[]) {
   return arr[Math.floor(rnd() * arr.length)];
 }
@@ -180,7 +192,8 @@ export function buildDemoData(accountId: string, range: Range, accountName = "No
           creative: {
             title: angle.title, body: angle.body, format: angle.format,
             cta: CTAS[(ci + s + a) % CTAS.length],
-            thumbnail: undefined,
+            thumbnail: demoCreativeThumbnail(angle.title, angle.format, ci + s + a),
+            videoId: /video|reel/i.test(angle.format) ? `demo-video-${ci}-${s}-${a}` : undefined,
           },
         });
       }

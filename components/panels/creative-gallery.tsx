@@ -13,11 +13,12 @@ export function CreativeGallery({ ads, code }: { ads: AdRow[]; code: string }) {
   const [location, setLocation] = React.useState("All studios");
   const [selected, setSelected] = React.useState<AdRow | null>(null);
   const locations = React.useMemo(() => ["All studios", ...new Set(ads.map((a) => a.location ?? "Unassigned"))], [ads]);
-  const formats = React.useMemo(() => ["All", ...new Set(ads.map((a) => a.creative?.videoId ? "Video" : "Image"))], [ads]);
+  const mediaType = (ad: AdRow) => ad.creative?.videoId || /video|reel/i.test(ad.creative?.format ?? "") ? "Video" : "Image";
+  const formats = React.useMemo(() => ["All", ...new Set(ads.map(mediaType))], [ads]);
   const visible = ads.filter((ad) => {
     const haystack = `${ad.name} ${ad.adSetName} ${ad.creative?.title ?? ""} ${ad.creative?.body ?? ""}`.toLowerCase();
     return (!query || haystack.includes(query.toLowerCase()))
-      && (format === "All" || (ad.creative?.videoId ? "Video" : "Image") === format)
+      && (format === "All" || mediaType(ad) === format)
       && (location === "All studios" || ad.location === location);
   });
 
@@ -67,8 +68,8 @@ export function CreativeGallery({ ads, code }: { ads: AdRow[]; code: string }) {
             <button key={ad.id} onClick={() => setSelected(ad)} aria-label={`Open creative and performance details for ${ad.name}`} className="group relative overflow-visible rounded-2xl border border-line bg-elevated/40 text-left transition duration-200 hover:z-10 hover:-translate-y-1 hover:scale-[1.035] hover:border-brand-500/40 hover:bg-surface hover:shadow-lift focus:z-10 focus:outline-none focus:ring-2 focus:ring-brand-500 motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
               <div className="relative aspect-video overflow-hidden bg-ink/5">
                 <div className="h-full w-full transition duration-300 group-hover:scale-[1.06] motion-reduce:transition-none">{media(ad)}</div>
-                {ad.creative?.videoId ? <span className="absolute inset-0 grid place-items-center bg-black/10"><span className="grid h-11 w-11 place-items-center rounded-full bg-black/70 text-white"><Play className="ml-0.5 h-4 w-4" fill="currentColor" /></span></span> : null}
-                <span className="absolute left-2 top-2"><Badge tone="neutral">{ad.creative?.videoId ? "Video" : "Image"}</Badge></span>
+                {mediaType(ad) === "Video" ? <span className="absolute inset-0 grid place-items-center bg-black/10"><span className="grid h-11 w-11 place-items-center rounded-full bg-black/70 text-white"><Play className="ml-0.5 h-4 w-4" fill="currentColor" /></span></span> : null}
+                <span className="absolute left-2 top-2"><Badge tone="neutral">{mediaType(ad)}</Badge></span>
                 <span className="absolute bottom-2 right-2 rounded-lg bg-black/75 px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">View details</span>
               </div>
               <div className="p-3">
